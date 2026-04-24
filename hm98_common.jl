@@ -615,6 +615,52 @@ field_limits(snapshots; symmetric = false) = symmetric ?
     let values = reduce(vcat, vec.(snapshots)); bound = maximum(abs, values); (-bound, bound) end :
     extrema(reduce(vcat, vec.(snapshots)))
 
+"""
+Compute a centered finite-difference derivative along the first dimension of a
+2D `y-z` array, falling back to one-sided differences at the boundaries.
+"""
+function first_derivative_y(field, y_nodes)
+    derivative = similar(field)
+
+    for j in axes(field, 1)
+        if j == firstindex(y_nodes)
+            Δy = y_nodes[j + 1] - y_nodes[j]
+            @views derivative[j, :] .= (field[j + 1, :] .- field[j, :]) ./ Δy
+        elseif j == lastindex(y_nodes)
+            Δy = y_nodes[j] - y_nodes[j - 1]
+            @views derivative[j, :] .= (field[j, :] .- field[j - 1, :]) ./ Δy
+        else
+            Δy = y_nodes[j + 1] - y_nodes[j - 1]
+            @views derivative[j, :] .= (field[j + 1, :] .- field[j - 1, :]) ./ Δy
+        end
+    end
+
+    return derivative
+end
+
+"""
+Compute a centered finite-difference derivative along the second dimension of a
+2D `y-z` array, falling back to one-sided differences at the boundaries.
+"""
+function first_derivative_z(field, z_nodes)
+    derivative = similar(field)
+
+    for k in axes(field, 2)
+        if k == firstindex(z_nodes)
+            Δz = z_nodes[k + 1] - z_nodes[k]
+            @views derivative[:, k] .= (field[:, k + 1] .- field[:, k]) ./ Δz
+        elseif k == lastindex(z_nodes)
+            Δz = z_nodes[k] - z_nodes[k - 1]
+            @views derivative[:, k] .= (field[:, k] .- field[:, k - 1]) ./ Δz
+        else
+            Δz = z_nodes[k + 1] - z_nodes[k - 1]
+            @views derivative[:, k] .= (field[:, k + 1] .- field[:, k - 1]) ./ Δz
+        end
+    end
+
+    return derivative
+end
+
 function plot_buoyancy_case(project_dir, experiment::HM98Experiment, runtime::HM98Runtime)
     output_path = default_output_path(project_dir, experiment)
     movie_path = default_movie_path(project_dir, experiment)
