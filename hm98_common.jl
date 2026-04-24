@@ -114,7 +114,8 @@ function experiment_spec(id::Int)
                               forcing = :uniform,
                               B_half = FT(1.96e-7),
                               plot_kind = :diagnostics,
-                              pv_limits = (-1.0, 1.0))
+                              pv_limits = (-1.0, 1.0),
+                              contours_on_all_panels = true)
     elseif id == 2
         return HM98Experiment(id = 2,
                               name = "experiment 2",
