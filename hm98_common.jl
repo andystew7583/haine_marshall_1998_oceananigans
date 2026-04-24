@@ -101,8 +101,9 @@ parse_env_float(name, default) = haskey(ENV, name) ? parse(Float64, ENV[name]) :
 """
     experiment_spec(id)
 
-Return the metadata for experiments 1–4. Experiments 3 and 4 are fully 3D in HM98.
-Experiment 4 follows Table 1 with doubled surface buoyancy loss relative to experiment 3.
+Return the metadata for experiments 1–4. Experiments 1–3 use the quasi-2D setup here,
+while experiment 4 is the fully 3D extension with doubled surface buoyancy loss relative
+to experiment 3.
 """
 function experiment_spec(id::Int)
     if id == 1
@@ -132,7 +133,7 @@ function experiment_spec(id::Int)
                               name = "experiment 3",
                               env_prefix = "HM98_EXP3",
                               output_prefix = "hm98_experiment3",
-                              dimensions = 3,
+                              dimensions = 2,
                               forcing = :patterned,
                               B_half = FT(1.96e-7),
                               cooling_stop_days = FT(5.0),
